@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.hc.client5.http.impl.DefaultClientConnectionReuseStrategy;
+import org.apache.hc.core5.function.ByteTransferListener;
 import org.apache.hc.core5.http.ConnectionReuseStrategy;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpConnection;
@@ -86,13 +87,19 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
     private final NHttpMessageParserFactory<HttpResponse> http1ResponseParserFactory;
     private final NHttpMessageWriterFactory<HttpRequest> http1RequestWriterFactory;
 
+    private ByteTransferListener incomingByteTransferListener;
+    private ByteTransferListener outgoingByteTransferListener;
+
     HttpAsyncClientProtocolNegotiationStarter(
             final HttpProcessor httpProcessor,
             final HandlerFactory<AsyncPushConsumer> exchangeHandlerFactory,
             final H2Config h2Config,
             final Http1Config h1Config,
             final CharCodingConfig charCodingConfig,
-            final ConnectionReuseStrategy connectionReuseStrategy) {
+            final ConnectionReuseStrategy connectionReuseStrategy,
+            final ByteTransferListener incomingByteTransferListener,
+            final ByteTransferListener outgoingByteTransferListener
+    ) {
         this.httpProcessor = Args.notNull(httpProcessor, "HTTP processor");
         this.exchangeHandlerFactory = exchangeHandlerFactory;
         this.h2Config = h2Config != null ? h2Config : H2Config.DEFAULT;
@@ -101,6 +108,8 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
         this.http1ConnectionReuseStrategy = connectionReuseStrategy != null ? connectionReuseStrategy : DefaultClientConnectionReuseStrategy.INSTANCE;
         this.http1ResponseParserFactory = new DefaultHttpResponseParserFactory(h1Config);
         this.http1RequestWriterFactory = DefaultHttpRequestWriterFactory.INSTANCE;
+        this.incomingByteTransferListener = incomingByteTransferListener;
+        this.outgoingByteTransferListener = outgoingByteTransferListener;
     }
 
     @Override
@@ -121,6 +130,8 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
                     http1ConnectionReuseStrategy,
                     http1ResponseParserFactory,
                     http1RequestWriterFactory,
+                    null,
+                    null,
                     new Http1StreamListener() {
 
                         @Override
@@ -154,7 +165,10 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
                             }
                         }
 
-                    });
+                    },
+                    incomingByteTransferListener,
+                    outgoingByteTransferListener
+                    );
             http2StreamHandlerFactory = new ClientH2StreamMultiplexerFactory(
                     httpProcessor,
                     exchangeHandlerFactory,
@@ -247,7 +261,12 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
                     http1ConnectionReuseStrategy,
                     http1ResponseParserFactory,
                     http1RequestWriterFactory,
-                    null);
+                    null,
+                    null,
+                    null, // Sunny TODO
+                    incomingByteTransferListener,
+                    outgoingByteTransferListener
+                    );
             http2StreamHandlerFactory = new ClientH2StreamMultiplexerFactory(
                     httpProcessor,
                     exchangeHandlerFactory,

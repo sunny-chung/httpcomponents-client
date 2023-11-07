@@ -37,6 +37,7 @@ import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBu
 import org.apache.hc.client5.http.nio.AsyncClientConnectionManager;
 import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.concurrent.DefaultThreadFactory;
+import org.apache.hc.core5.function.ByteTransferListener;
 import org.apache.hc.core5.http.config.CharCodingConfig;
 import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
@@ -160,7 +161,10 @@ public final class HttpAsyncClients {
                         h2Config,
                         h1Config,
                         CharCodingConfig.DEFAULT,
-                        DefaultClientConnectionReuseStrategy.INSTANCE),
+                        DefaultClientConnectionReuseStrategy.INSTANCE,
+                        null,
+                        null
+                        ),
                 pushConsumerRegistry,
                 ioReactorConfig,
                 connmgr,
@@ -188,7 +192,36 @@ public final class HttpAsyncClients {
                         h2Config,
                         h1Config,
                         CharCodingConfig.DEFAULT,
-                        DefaultClientConnectionReuseStrategy.INSTANCE),
+                        DefaultClientConnectionReuseStrategy.INSTANCE,
+                        null,
+                        null),
+                pushConsumerRegistry,
+                ioReactorConfig,
+                connmgr,
+                DefaultSchemePortResolver.INSTANCE,
+                null);
+    }
+
+    public static MinimalHttpAsyncClient createMinimal(
+            final H2Config h2Config,
+            final Http1Config h1Config,
+            final IOReactorConfig ioReactorConfig,
+            final AsyncClientConnectionManager connmgr,
+            final ByteTransferListener incomingByteTransferListener,
+            final ByteTransferListener outgoingByteTransferListener
+    ) {
+        final AsyncPushConsumerRegistry pushConsumerRegistry = new AsyncPushConsumerRegistry();
+        return createMinimalHttpAsyncClientImpl(
+                new HttpAsyncClientProtocolNegotiationStarter(
+                        createMinimalProtocolProcessor(),
+                        (request, context) -> pushConsumerRegistry.get(request),
+                        h2Config,
+                        h1Config,
+                        CharCodingConfig.DEFAULT,
+                        DefaultClientConnectionReuseStrategy.INSTANCE,
+                        incomingByteTransferListener,
+                        outgoingByteTransferListener
+                ),
                 pushConsumerRegistry,
                 ioReactorConfig,
                 connmgr,
