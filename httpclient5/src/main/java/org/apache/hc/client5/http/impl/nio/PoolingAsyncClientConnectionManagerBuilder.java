@@ -32,6 +32,7 @@ import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.SchemePortResolver;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.TlsConfig;
+import org.apache.hc.client5.http.function.ConnectionListener;
 import org.apache.hc.client5.http.ssl.ConscryptClientTlsStrategy;
 import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.function.Resolver;
@@ -85,6 +86,7 @@ public class PoolingAsyncClientConnectionManagerBuilder {
 
     private Resolver<HttpRoute, ConnectionConfig> connectionConfigResolver;
     private Resolver<HttpHost, TlsConfig> tlsConfigResolver;
+    private ConnectionListener connectionListener;
 
     public static PoolingAsyncClientConnectionManagerBuilder create() {
         return new PoolingAsyncClientConnectionManagerBuilder();
@@ -220,6 +222,11 @@ public class PoolingAsyncClientConnectionManagerBuilder {
         return this;
     }
 
+    public PoolingAsyncClientConnectionManagerBuilder setConnectionListener(final ConnectionListener connectionListener) {
+        this.connectionListener = connectionListener;
+        return this;
+    }
+
     /**
      * Use system properties when creating and configuring default
      * implementations.
@@ -256,7 +263,8 @@ public class PoolingAsyncClientConnectionManagerBuilder {
                 poolReusePolicy,
                 null,
                 schemePortResolver,
-                dnsResolver);
+                dnsResolver,
+                connectionListener);
         poolingmgr.setConnectionConfigResolver(connectionConfigResolver);
         poolingmgr.setTlsConfigResolver(tlsConfigResolver);
         if (maxConnTotal > 0) {

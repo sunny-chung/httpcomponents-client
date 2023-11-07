@@ -41,6 +41,7 @@ import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.SchemePortResolver;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.TlsConfig;
+import org.apache.hc.client5.http.function.ConnectionListener;
 import org.apache.hc.client5.http.impl.ConnPoolSupport;
 import org.apache.hc.client5.http.impl.ConnectionShutdownException;
 import org.apache.hc.client5.http.impl.PrefixedIncrementingId;
@@ -127,6 +128,8 @@ public class PoolingAsyncClientConnectionManager implements AsyncClientConnectio
     private volatile Resolver<HttpRoute, ConnectionConfig> connectionConfigResolver;
     private volatile Resolver<HttpHost, TlsConfig> tlsConfigResolver;
 
+    private ConnectionListener connectionListener;
+
     public PoolingAsyncClientConnectionManager() {
         this(RegistryBuilder.<TlsStrategy>create()
                 .register(URIScheme.HTTPS.getId(), DefaultClientTlsStrategy.getDefault())
@@ -158,8 +161,21 @@ public class PoolingAsyncClientConnectionManager implements AsyncClientConnectio
             final PoolReusePolicy poolReusePolicy,
             final TimeValue timeToLive,
             final SchemePortResolver schemePortResolver,
-            final DnsResolver dnsResolver) {
-        this(new DefaultAsyncClientConnectionOperator(tlsStrategyLookup, schemePortResolver, dnsResolver),
+            final DnsResolver dnsResolver
+    ) {
+        this(tlsStrategyLookup, poolConcurrencyPolicy, poolReusePolicy, timeToLive, schemePortResolver, dnsResolver, null);
+    }
+
+    public PoolingAsyncClientConnectionManager(
+            final Lookup<TlsStrategy> tlsStrategyLookup,
+            final PoolConcurrencyPolicy poolConcurrencyPolicy,
+            final PoolReusePolicy poolReusePolicy,
+            final TimeValue timeToLive,
+            final SchemePortResolver schemePortResolver,
+            final DnsResolver dnsResolver,
+            final ConnectionListener connectionListener
+    ) {
+        this(new DefaultAsyncClientConnectionOperator(tlsStrategyLookup, schemePortResolver, dnsResolver, connectionListener),
                 poolConcurrencyPolicy, poolReusePolicy, timeToLive);
     }
 

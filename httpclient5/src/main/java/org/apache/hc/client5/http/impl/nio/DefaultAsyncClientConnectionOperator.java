@@ -35,6 +35,7 @@ import java.util.concurrent.Future;
 import org.apache.hc.client5.http.DnsResolver;
 import org.apache.hc.client5.http.SchemePortResolver;
 import org.apache.hc.client5.http.config.TlsConfig;
+import org.apache.hc.client5.http.function.ConnectionListener;
 import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
 import org.apache.hc.client5.http.nio.AsyncClientConnectionOperator;
 import org.apache.hc.client5.http.nio.ManagedAsyncClientConnection;
@@ -54,19 +55,26 @@ import org.apache.hc.core5.reactor.ssl.TransportSecurityLayer;
 import org.apache.hc.core5.util.Args;
 import org.apache.hc.core5.util.Timeout;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+
 final class DefaultAsyncClientConnectionOperator implements AsyncClientConnectionOperator {
 
     private final SchemePortResolver schemePortResolver;
     private final MultihomeIOSessionRequester sessionRequester;
     private final Lookup<TlsStrategy> tlsStrategyLookup;
+    private final ConnectionListener connectionListener;
 
     DefaultAsyncClientConnectionOperator(
             final Lookup<TlsStrategy> tlsStrategyLookup,
             final SchemePortResolver schemePortResolver,
-            final DnsResolver dnsResolver) {
+            final DnsResolver dnsResolver,
+            final ConnectionListener connectionListener
+            ) {
         this.tlsStrategyLookup = Args.notNull(tlsStrategyLookup, "TLS strategy lookup");
         this.schemePortResolver = schemePortResolver != null ? schemePortResolver : DefaultSchemePortResolver.INSTANCE;
         this.sessionRequester = new MultihomeIOSessionRequester(dnsResolver);
+        this.connectionListener = connectionListener;
     }
 
     @Override
@@ -109,6 +117,9 @@ final class DefaultAsyncClientConnectionOperator implements AsyncClientConnectio
                     @Override
                     public void completed(final IOSession session) {
                         final DefaultManagedAsyncClientConnection connection = new DefaultManagedAsyncClientConnection(session);
+                        if (connectionListener != null) {
+                            connectionListener.onConnectedHost(connection.getRemoteAddress().toString(), connection.getProtocolVersion().format());
+                        }
                         if (tlsStrategy != null && URIScheme.HTTPS.same(host.getSchemeName())) {
                             try {
                                 final Timeout socketTimeout = connection.getSocketTimeout();
@@ -123,6 +134,21 @@ final class DefaultAsyncClientConnectionOperator implements AsyncClientConnectio
                                             @Override
                                             public void completed(final TransportSecurityLayer transportSecurityLayer) {
                                                 connection.setSocketTimeout(socketTimeout);
+                                                if (connectionListener != null) {
+                                                    final SSLSession sslSession = transportSecurityLayer.getTlsDetails().getSSLSession();
+                                                    try {
+                                                        connectionListener.onTlsUpgraded(
+                                                                sslSession.getProtocol(),
+                                                                sslSession.getCipherSuite(),
+                                                                sslSession.getLocalPrincipal(),
+                                                                sslSession.getLocalCertificates(),
+                                                                sslSession.getPeerPrincipal(),
+                                                                sslSession.getPeerCertificates()
+                                                        );
+                                                    } catch (final SSLPeerUnverifiedException e) {
+                                                        throw new RuntimeException(e);
+                                                    }
+                                                }
                                                 future.completed(connection);
                                             }
 
