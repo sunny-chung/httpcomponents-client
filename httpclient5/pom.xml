@@ -30,6 +30,7 @@
     <artifactId>httpclient5-parent</artifactId>
     <version>5.2.1-inspect-patch1</version>
   </parent>
+  <groupId>io.github.sunny-chung</groupId>
   <artifactId>httpclient5</artifactId>
   <name>Apache HttpClient</name>
   <description>Apache HttpComponents Client</description>
@@ -41,11 +42,11 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.httpcomponents.core5</groupId>
+      <groupId>io.github.sunny-chung</groupId>
       <artifactId>httpcore5</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents.core5</groupId>
+      <groupId>io.github.sunny-chung</groupId>
       <artifactId>httpcore5-h2</artifactId>
     </dependency>
     <dependency>
@@ -174,6 +175,26 @@
               <overwrite>true</overwrite>
               <skipCache>true</skipCache>
             </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>release-sonatype</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
