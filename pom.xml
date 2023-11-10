@@ -30,10 +30,10 @@
     <version>13</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.httpcomponents.client5</groupId>
+  <groupId>io.github.sunny-chung</groupId>
   <artifactId>httpclient5-parent</artifactId>
   <name>Apache HttpComponents Client Parent</name>
-  <version>5.2.1-inspect-patch1</version>
+  <version>5.2.1-inspect-patch2</version>
   <description>Apache HttpComponents Client is a library of components for building client side HTTP services</description>
   <url>https://hc.apache.org/httpcomponents-client-5.0.x/${project.version}/</url>
   <inceptionYear>1999</inceptionYear>
@@ -210,10 +210,10 @@
 
   <modules>
     <module>httpclient5</module>
-    <module>httpclient5-fluent</module>
-    <module>httpclient5-cache</module>
-    <module>httpclient5-win</module>
-    <module>httpclient5-testing</module>
+<!--    <module>httpclient5-fluent</module>-->
+<!--    <module>httpclient5-cache</module>-->
+<!--    <module>httpclient5-win</module>-->
+<!--    <module>httpclient5-testing</module>-->
   </modules>
 
   <build>
@@ -468,5 +468,29 @@
       </plugin>
     </plugins>
   </reporting>
+
+  <profiles>
+
+    <profile>
+      <id>release-sonatype</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
