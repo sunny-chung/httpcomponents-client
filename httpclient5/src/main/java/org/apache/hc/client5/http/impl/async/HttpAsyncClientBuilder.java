@@ -944,6 +944,7 @@ public class HttpAsyncClientBuilder {
                 charCodingConfig != null ? charCodingConfig : CharCodingConfig.DEFAULT,
                 reuseStrategyCopy,
                 null,
+                null,
                 null
                 );
         final DefaultConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(

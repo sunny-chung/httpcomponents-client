@@ -162,7 +162,9 @@ class H2AsyncClientProtocolStarter implements IOEventHandlerFactory {
                             }
                         }
 
-                    });
+                    },
+                    null
+            );
             return new ClientH2PrefaceHandler(ioSession, http2StreamHandlerFactory, false);
         }
         final ClientH2StreamMultiplexerFactory http2StreamHandlerFactory = new ClientH2StreamMultiplexerFactory(
@@ -170,7 +172,9 @@ class H2AsyncClientProtocolStarter implements IOEventHandlerFactory {
                 exchangeHandlerFactory,
                 h2Config,
                 charCodingConfig,
-                null);
+                null,
+                null
+        );
         return new ClientH2PrefaceHandler(ioSession, http2StreamHandlerFactory, false);
    }
 

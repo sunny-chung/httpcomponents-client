@@ -46,6 +46,7 @@ import org.apache.hc.core5.http.protocol.HttpProcessor;
 import org.apache.hc.core5.http.protocol.RequestUserAgent;
 import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.http2.config.H2Config;
+import org.apache.hc.core5.http2.impl.nio.H2InspectListener;
 import org.apache.hc.core5.http2.protocol.H2RequestConnControl;
 import org.apache.hc.core5.http2.protocol.H2RequestContent;
 import org.apache.hc.core5.http2.protocol.H2RequestTargetHost;
@@ -163,6 +164,7 @@ public final class HttpAsyncClients {
                         CharCodingConfig.DEFAULT,
                         DefaultClientConnectionReuseStrategy.INSTANCE,
                         null,
+                        null,
                         null
                         ),
                 pushConsumerRegistry,
@@ -194,7 +196,9 @@ public final class HttpAsyncClients {
                         CharCodingConfig.DEFAULT,
                         DefaultClientConnectionReuseStrategy.INSTANCE,
                         null,
-                        null),
+                        null,
+                        null
+                ),
                 pushConsumerRegistry,
                 ioReactorConfig,
                 connmgr,
@@ -208,7 +212,8 @@ public final class HttpAsyncClients {
             final IOReactorConfig ioReactorConfig,
             final AsyncClientConnectionManager connmgr,
             final ByteTransferListener incomingByteTransferListener,
-            final ByteTransferListener outgoingByteTransferListener
+            final ByteTransferListener outgoingByteTransferListener,
+            final H2InspectListener h2InspectListener
     ) {
         final AsyncPushConsumerRegistry pushConsumerRegistry = new AsyncPushConsumerRegistry();
         return createMinimalHttpAsyncClientImpl(
@@ -220,7 +225,8 @@ public final class HttpAsyncClients {
                         CharCodingConfig.DEFAULT,
                         DefaultClientConnectionReuseStrategy.INSTANCE,
                         incomingByteTransferListener,
-                        outgoingByteTransferListener
+                        outgoingByteTransferListener,
+                        h2InspectListener
                 ),
                 pushConsumerRegistry,
                 ioReactorConfig,

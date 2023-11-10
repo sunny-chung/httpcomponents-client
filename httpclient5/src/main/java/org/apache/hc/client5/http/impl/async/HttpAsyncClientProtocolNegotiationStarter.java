@@ -60,6 +60,7 @@ import org.apache.hc.core5.http2.impl.nio.ClientH2PrefaceHandler;
 import org.apache.hc.core5.http2.impl.nio.ClientH2StreamMultiplexerFactory;
 import org.apache.hc.core5.http2.impl.nio.ClientH2UpgradeHandler;
 import org.apache.hc.core5.http2.impl.nio.ClientHttp1UpgradeHandler;
+import org.apache.hc.core5.http2.impl.nio.H2InspectListener;
 import org.apache.hc.core5.http2.impl.nio.H2StreamListener;
 import org.apache.hc.core5.http2.impl.nio.HttpProtocolNegotiator;
 import org.apache.hc.core5.http2.ssl.ApplicationProtocol;
@@ -89,6 +90,7 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
 
     private ByteTransferListener incomingByteTransferListener;
     private ByteTransferListener outgoingByteTransferListener;
+    private H2InspectListener h2InspectListener;
 
     HttpAsyncClientProtocolNegotiationStarter(
             final HttpProcessor httpProcessor,
@@ -98,8 +100,9 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
             final CharCodingConfig charCodingConfig,
             final ConnectionReuseStrategy connectionReuseStrategy,
             final ByteTransferListener incomingByteTransferListener,
-            final ByteTransferListener outgoingByteTransferListener
-    ) {
+            final ByteTransferListener outgoingByteTransferListener,
+            final H2InspectListener h2InspectListener
+            ) {
         this.httpProcessor = Args.notNull(httpProcessor, "HTTP processor");
         this.exchangeHandlerFactory = exchangeHandlerFactory;
         this.h2Config = h2Config != null ? h2Config : H2Config.DEFAULT;
@@ -110,6 +113,7 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
         this.http1RequestWriterFactory = DefaultHttpRequestWriterFactory.INSTANCE;
         this.incomingByteTransferListener = incomingByteTransferListener;
         this.outgoingByteTransferListener = outgoingByteTransferListener;
+        this.h2InspectListener = h2InspectListener;
     }
 
     @Override
@@ -252,7 +256,9 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
                             }
                         }
 
-                    });
+                    },
+                    h2InspectListener
+            );
         } else {
             http1StreamHandlerFactory = new ClientHttp1StreamDuplexerFactory(
                     httpProcessor,
@@ -272,7 +278,37 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
                     exchangeHandlerFactory,
                     h2Config,
                     charCodingConfig,
-                    null);
+                    new H2StreamListener() {
+                        @Override
+                        public void onHeaderInput(final HttpConnection connection, final int streamId, final List<? extends Header> headers) {
+
+                        }
+
+                        @Override
+                        public void onHeaderOutput(final HttpConnection connection, final int streamId, final List<? extends Header> headers) {
+
+                        }
+
+                        @Override
+                        public void onFrameInput(final HttpConnection connection, final int streamId, final RawFrame frame) {
+                        }
+
+                        @Override
+                        public void onFrameOutput(final HttpConnection connection, final int streamId, final RawFrame frame) {
+                        }
+
+                        @Override
+                        public void onInputFlowControl(final HttpConnection connection, final int streamId, final int delta, final int actualSize) {
+
+                        }
+
+                        @Override
+                        public void onOutputFlowControl(final HttpConnection connection, final int streamId, final int delta, final int actualSize) {
+
+                        }
+                    },
+                    h2InspectListener
+            );
         }
 
         ioSession.registerProtocol(ApplicationProtocol.HTTP_1_1.id, new ClientHttp1UpgradeHandler(http1StreamHandlerFactory));
