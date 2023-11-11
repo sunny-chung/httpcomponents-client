@@ -29,7 +29,7 @@ Usage
 -----
 
 ```kotlin
-implementation("io.github.sunny-chung:httpclient5:5.2.1-inspect-patch2")
+implementation("io.github.sunny-chung:httpclient5:5.2.1-inspect-patch3")
 ```
 
 Licensing
