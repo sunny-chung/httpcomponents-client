@@ -140,6 +140,7 @@ final class DefaultAsyncClientConnectionOperator implements AsyncClientConnectio
                                                         connectionListener.onTlsUpgraded(
                                                                 sslSession.getProtocol(),
                                                                 sslSession.getCipherSuite(),
+                                                                transportSecurityLayer.getTlsDetails().getApplicationProtocol(),
                                                                 sslSession.getLocalPrincipal(),
                                                                 sslSession.getLocalCertificates(),
                                                                 sslSession.getPeerPrincipal(),

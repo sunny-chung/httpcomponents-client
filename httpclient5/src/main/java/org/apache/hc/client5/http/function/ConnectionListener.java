@@ -34,5 +34,5 @@ public interface ConnectionListener {
 
     void onConnectedHost(String remoteAddress, String protocolVersion);
 
-    void onTlsUpgraded(String protocol, String cipherSuite, Principal localPrincipal, Certificate[] localCertificates, Principal peerPrincipal, Certificate[] peerCertificates);
+    void onTlsUpgraded(String protocol, String cipherSuite, String applicationProtocol, Principal localPrincipal, Certificate[] localCertificates, Principal peerPrincipal, Certificate[] peerCertificates);
 }
