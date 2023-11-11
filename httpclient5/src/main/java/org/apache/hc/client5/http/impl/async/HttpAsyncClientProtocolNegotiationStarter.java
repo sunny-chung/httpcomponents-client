@@ -312,7 +312,7 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
         }
 
         ioSession.registerProtocol(ApplicationProtocol.HTTP_1_1.id, new ClientHttp1UpgradeHandler(http1StreamHandlerFactory));
-        ioSession.registerProtocol(ApplicationProtocol.HTTP_2.id, new ClientH2UpgradeHandler(http2StreamHandlerFactory));
+        ioSession.registerProtocol(ApplicationProtocol.HTTP_2.id, new ClientH2UpgradeHandler(http2StreamHandlerFactory, outgoingByteTransferListener));
 
         final HttpVersionPolicy versionPolicy = attachment instanceof HttpVersionPolicy ? (HttpVersionPolicy) attachment : HttpVersionPolicy.NEGOTIATE;
         switch (versionPolicy) {
