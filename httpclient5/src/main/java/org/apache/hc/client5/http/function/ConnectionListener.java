@@ -32,6 +32,8 @@ import java.security.cert.Certificate;
 
 public interface ConnectionListener {
 
+    void onConnectStart(String remoteAddress);
+
     void onConnectedHost(String remoteAddress, String protocolVersion);
 
     void onTlsUpgraded(String protocol, String cipherSuite, String applicationProtocol, Principal localPrincipal, Certificate[] localCertificates, Principal peerPrincipal, Certificate[] peerCertificates);

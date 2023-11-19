@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.hc.client5.http.ConnectExceptionSupport;
 import org.apache.hc.client5.http.DnsResolver;
 import org.apache.hc.client5.http.SystemDefaultDnsResolver;
+import org.apache.hc.client5.http.function.ConnectionListener;
 import org.apache.hc.core5.concurrent.ComplexFuture;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.net.NamedEndpoint;
@@ -64,6 +65,7 @@ final class MultihomeIOSessionRequester {
             final SocketAddress localAddress,
             final Timeout connectTimeout,
             final Object attachment,
+            final ConnectionListener connectionListener,
             final FutureCallback<IOSession> callback) {
 
         final ComplexFuture<IOSession> future = new ComplexFuture<>(callback);
@@ -71,6 +73,9 @@ final class MultihomeIOSessionRequester {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("{}:{} connecting {} to {} ({})",
                         remoteEndpoint.getHostName(), remoteEndpoint.getPort(), localAddress, remoteAddress, connectTimeout);
+            }
+            if (connectionListener != null) {
+                connectionListener.onConnectStart(remoteAddress.toString());
             }
             final Future<IOSession> sessionFuture = connectionInitiator.connect(remoteEndpoint, remoteAddress, localAddress, connectTimeout, attachment, new FutureCallback<IOSession>() {
                 @Override
@@ -131,6 +136,9 @@ final class MultihomeIOSessionRequester {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("{}:{} connecting {}->{} ({})",
                             remoteEndpoint.getHostName(), remoteEndpoint.getPort(), localAddress, remoteAddress, connectTimeout);
+                }
+                if (connectionListener != null) {
+                    connectionListener.onConnectStart(remoteAddress.toString());
                 }
 
                 final Future<IOSession> sessionFuture = connectionInitiator.connect(
@@ -197,7 +205,7 @@ final class MultihomeIOSessionRequester {
             final Timeout connectTimeout,
             final Object attachment,
             final FutureCallback<IOSession> callback) {
-        return connect(connectionInitiator, remoteEndpoint, null, localAddress, connectTimeout, attachment, callback);
+        return connect(connectionInitiator, remoteEndpoint, null, localAddress, connectTimeout, attachment, null, callback);
     }
 
 }

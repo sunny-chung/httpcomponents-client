@@ -112,6 +112,7 @@ final class DefaultAsyncClientConnectionOperator implements AsyncClientConnectio
                 localAddress,
                 connectTimeout,
                 tlsConfig.getHttpVersionPolicy(),
+                connectionListener,
                 new FutureCallback<IOSession>() {
 
                     @Override

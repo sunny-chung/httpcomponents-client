@@ -67,7 +67,7 @@ public final class MultihomeConnectionInitiator implements ConnectionInitiator {
             final Object attachment,
             final FutureCallback<IOSession> callback) {
         Args.notNull(remoteEndpoint, "Remote endpoint");
-        return sessionRequester.connect(connectionInitiator, remoteEndpoint, remoteAddress, localAddress, connectTimeout, attachment, callback);
+        return sessionRequester.connect(connectionInitiator, remoteEndpoint, remoteAddress, localAddress, connectTimeout, attachment, null, callback);
     }
 
     public Future<IOSession> connect(
