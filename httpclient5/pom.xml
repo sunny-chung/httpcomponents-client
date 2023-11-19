@@ -28,7 +28,7 @@
   <parent>
     <groupId>io.github.sunny-chung</groupId>
     <artifactId>httpclient5-parent</artifactId>
-    <version>5.2.1-inspect-patch3</version>
+    <version>5.2.1-inspect-patch4</version>
   </parent>
   <groupId>io.github.sunny-chung</groupId>
   <artifactId>httpclient5</artifactId>
