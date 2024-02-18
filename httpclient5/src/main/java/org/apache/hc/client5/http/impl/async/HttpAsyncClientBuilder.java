@@ -945,6 +945,7 @@ public class HttpAsyncClientBuilder {
                 reuseStrategyCopy,
                 null,
                 null,
+                null,
                 null
                 );
         final DefaultConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(

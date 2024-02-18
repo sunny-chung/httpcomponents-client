@@ -91,6 +91,7 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
     private ByteTransferListener incomingByteTransferListener;
     private ByteTransferListener outgoingByteTransferListener;
     private H2InspectListener h2InspectListener;
+    private Http1StreamListener h1StreamListener;
 
     HttpAsyncClientProtocolNegotiationStarter(
             final HttpProcessor httpProcessor,
@@ -101,7 +102,8 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
             final ConnectionReuseStrategy connectionReuseStrategy,
             final ByteTransferListener incomingByteTransferListener,
             final ByteTransferListener outgoingByteTransferListener,
-            final H2InspectListener h2InspectListener
+            final H2InspectListener h2InspectListener,
+            final Http1StreamListener h1StreamListener
             ) {
         this.httpProcessor = Args.notNull(httpProcessor, "HTTP processor");
         this.exchangeHandlerFactory = exchangeHandlerFactory;
@@ -114,6 +116,7 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
         this.incomingByteTransferListener = incomingByteTransferListener;
         this.outgoingByteTransferListener = outgoingByteTransferListener;
         this.h2InspectListener = h2InspectListener;
+        this.h1StreamListener = h1StreamListener;
     }
 
     @Override
@@ -269,7 +272,7 @@ class HttpAsyncClientProtocolNegotiationStarter implements IOEventHandlerFactory
                     http1RequestWriterFactory,
                     null,
                     null,
-                    null, // Sunny TODO
+                    h1StreamListener,
                     incomingByteTransferListener,
                     outgoingByteTransferListener
                     );

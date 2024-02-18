@@ -40,6 +40,7 @@ import org.apache.hc.core5.concurrent.DefaultThreadFactory;
 import org.apache.hc.core5.function.ByteTransferListener;
 import org.apache.hc.core5.http.config.CharCodingConfig;
 import org.apache.hc.core5.http.config.Http1Config;
+import org.apache.hc.core5.http.impl.Http1StreamListener;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.DefaultHttpProcessor;
 import org.apache.hc.core5.http.protocol.HttpProcessor;
@@ -165,6 +166,7 @@ public final class HttpAsyncClients {
                         DefaultClientConnectionReuseStrategy.INSTANCE,
                         null,
                         null,
+                        null,
                         null
                         ),
                 pushConsumerRegistry,
@@ -197,6 +199,7 @@ public final class HttpAsyncClients {
                         DefaultClientConnectionReuseStrategy.INSTANCE,
                         null,
                         null,
+                        null,
                         null
                 ),
                 pushConsumerRegistry,
@@ -213,8 +216,9 @@ public final class HttpAsyncClients {
             final AsyncClientConnectionManager connmgr,
             final ByteTransferListener incomingByteTransferListener,
             final ByteTransferListener outgoingByteTransferListener,
-            final H2InspectListener h2InspectListener
-    ) {
+            final H2InspectListener h2InspectListener,
+            final Http1StreamListener h1StreamListener
+            ) {
         final AsyncPushConsumerRegistry pushConsumerRegistry = new AsyncPushConsumerRegistry();
         return createMinimalHttpAsyncClientImpl(
                 new HttpAsyncClientProtocolNegotiationStarter(
@@ -226,7 +230,8 @@ public final class HttpAsyncClients {
                         DefaultClientConnectionReuseStrategy.INSTANCE,
                         incomingByteTransferListener,
                         outgoingByteTransferListener,
-                        h2InspectListener
+                        h2InspectListener,
+                        h1StreamListener
                 ),
                 pushConsumerRegistry,
                 ioReactorConfig,
